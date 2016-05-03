@@ -111,7 +111,7 @@ public class CoreService extends Service {
 
                 // Establish the connection.
                 try {
-                    btSocket.connect(); 
+                    btSocket.connect();
                     connected = true;
                 } catch (IOException e) {
                     try {
