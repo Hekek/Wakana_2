@@ -22,15 +22,12 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
-    //TEST VAR
-    public static Integer[] frequencies;
-    //
-
     static final int PICK_CONTACT_REQUEST = 1;
     public static String EXTRA_DEVICE_ADDRESS;
     public static String BLUETOOTH_DEVICE_MAC = null;
 
     private Switch wakanaSwitch;
+    private Switch tremorSwitch;
 
     private Visualizer audioOutput = null;
     AudioTrack visualizedTrack = null;
@@ -42,16 +39,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //Test Code
-        int steps = 8;
-        int range = 100;
-        frequencies = new Integer[steps];
-        for(int i = 0; i < steps; i++) {
-            frequencies[i] = range / steps * i;
-        }
-
-        createVisualizer();
 
         //Enable Wakana to start service
         wakanaSwitch = (Switch) findViewById(R.id.wakanaSwitch);
@@ -77,6 +64,31 @@ public class MainActivity extends AppCompatActivity {
                     stopVisualizer();
                 }
 
+            }
+        });
+
+        //Tremor Switch
+        tremorSwitch = (Switch) findViewById(R.id.tremorSwitch);
+        tremorSwitch.setChecked(false);
+        tremorSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                if (isChecked) {
+                    toast("Switch is currently ON");
+                    if (BLUETOOTH_DEVICE_MAC == null) {
+                        toast("No Bluetooth Device Selected!");
+                        startVisualizer();
+                    } else {
+                        startCore();
+                        toast("Wakana Enabled");
+                    }
+
+                } else {
+                    stopCore();
+                    stopVisualizer();
+                }
             }
         });
     }
@@ -135,31 +147,6 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
     }
 
-    private void createVisualizer(){
-        final int minBufferSize = AudioTrack.getMinBufferSize(Visualizer.getMaxCaptureRate(), AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_8BIT);
-        visualizedTrack = new AudioTrack(AudioManager.STREAM_MUSIC, Visualizer.getMaxCaptureRate(), AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_8BIT, minBufferSize, AudioTrack.MODE_STREAM);
-        visualizedTrack.play();
-        audioOutput = new Visualizer(0); // get output audio stream
-
-        audioOutput.setEnabled(false);
-        audioOutput.setCaptureSize(Visualizer.getCaptureSizeRange()[0]);
-        toast("Capture size range: "+Arrays.toString(Visualizer.getCaptureSizeRange()));
-        audioOutput.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
-            @Override
-            public void onWaveFormDataCapture(Visualizer visualizer, byte[] waveform, int samplingRate) {
-                //visualizedTrack.write(waveform, 0, waveform.length);
-            }
-
-            @Override
-            public void onFftDataCapture(Visualizer visualizer, byte[] fft, int samplingRate) {
-                //Log.i(TAG, Arrays.toString(fft));
-                generateData(fft);
-            }
-        }, Visualizer.getMaxCaptureRate(), false, true); // waveform not freq data
-
-
-    }
-
     private void startVisualizer(){
         audioOutput.setEnabled(true);
     }
@@ -168,25 +155,4 @@ public class MainActivity extends AppCompatActivity {
         audioOutput.setEnabled(false);
     }
 
-    private void generateData(byte[] fft){
-        Float mean = 0.0f;
-        Float absoluteMean = 0.0f;
-        Float [] Mean = new Float[8];
-        Float [] AbsMean = new Float[8];
-        String var = Arrays.toString(fft);
-        String[] vars = var.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(" ","").split(",");
-        for (int j = 0 ; j < 8 ; j++){
-            mean = 0.0f;
-            absoluteMean = 0.0f;
-            for (int i = 0 ; i < 16 ; i++){
-                mean += Integer.parseInt(vars[i+j]);
-                absoluteMean += Math.abs(Integer.parseInt(vars[i+j]));
-                //System.out.println("Group("+j+") Freq:"+vars[i+j]);
-            }
-            Mean[j] = mean/16.f;
-            AbsMean[j] = absoluteMean/16.f;
-        }
-        Log.i(TAG, Arrays.toString(AbsMean));
-
-    }
 }

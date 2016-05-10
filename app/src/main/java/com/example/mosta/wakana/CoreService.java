@@ -9,12 +9,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.media.audiofx.Visualizer;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
-import android.os.Process;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -29,6 +24,7 @@ import java.util.UUID;
  */
 public class CoreService extends Service {
 
+    //Tag for terminal output
     private static final String TAG = "CORE";
 
     private BluetoothAdapter btAdapter = null;
@@ -37,7 +33,6 @@ public class CoreService extends Service {
     private String btAdress= null;
 
     private boolean connected = false ;
-    private boolean running = true ;
 
     public static String EXTRA_DEVICE_ADDRESS;
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -48,9 +43,6 @@ public class CoreService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG,"SERVICEEEEE");
-
-
         final int minBufferSize = AudioTrack.getMinBufferSize(Visualizer.getMaxCaptureRate(), AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_8BIT);
         visualizedTrack = new AudioTrack(AudioManager.STREAM_MUSIC, Visualizer.getMaxCaptureRate(), AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_8BIT, minBufferSize, AudioTrack.MODE_STREAM);
         visualizedTrack.play();
@@ -61,11 +53,13 @@ public class CoreService extends Service {
         audioOutput.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
             @Override
             public void onWaveFormDataCapture(Visualizer visualizer, byte[] waveform, int samplingRate) {
+                //We don't need Waveform data so i disabled it
                 //visualizedTrack.write(waveform, 0, waveform.length);
             }
 
             @Override
             public void onFftDataCapture(Visualizer visualizer, byte[] fft, int samplingRate) {
+
                 Float mean = 0.0f;
                 Float absoluteMean = 0.0f;
                 Float [] Mean = new Float[8];
@@ -83,10 +77,10 @@ public class CoreService extends Service {
                     Mean[j] = mean/16.f;
                     AbsMean[j] = absoluteMean/16.f;
                 }
-                //Log.i(TAG, Arrays.toString(AbsMean));
-                sendData(Arrays.toString(AbsMean)+"\n");
+                Log.i(TAG, Arrays.toString(AbsMean));
+                sendData(Arrays.toString(AbsMean).replaceAll(" ","").replaceAll("\\[","@").replaceAll("\\]","!")+"\n");
             }
-        }, Visualizer.getMaxCaptureRate(), false, true); // waveform not freq data
+        }, Visualizer.getMaxCaptureRate() / 4, false, true); // waveform not freq data , divide the capture rate by 4 to get less data
     }
 
     @Override
@@ -127,12 +121,11 @@ public class CoreService extends Service {
                 } catch (IOException e) {
                     Log.v(TAG, "ERROR - Could not create bluetooth outstream");
                 }
-
-                sendData("WaKaNa Connected");
+                sendData("WaKaNa Connected"+"\n");
             }
             catch (InterruptedException e) {}
         }
-        new Thread(new Runnable() {
+        new Thread(new Runnable(){
             @Override
             public void run() {
                 audioOutput.setEnabled(true);

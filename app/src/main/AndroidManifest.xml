@@ -23,6 +23,7 @@
         </activity>
         <activity android:name=".DeviceListActivity"></activity>
         <service android:name=".CoreService"></service>
+        <service android:name=".TremorService"></service>
     </application>
 
 </manifest>
