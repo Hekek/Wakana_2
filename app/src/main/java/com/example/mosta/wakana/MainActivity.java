@@ -29,9 +29,6 @@ public class MainActivity extends AppCompatActivity {
     private Switch senseSwitch;
     private Switch tremorSwitch;
 
-    private Visualizer audioOutput = null;
-    AudioTrack visualizedTrack = null;
-    MediaPlayer mp = null;
 
     private static final String TAG = "CORE";
 
