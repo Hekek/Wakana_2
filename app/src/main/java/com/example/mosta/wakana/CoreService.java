@@ -59,7 +59,6 @@ public class CoreService extends Service {
 
             @Override
             public void onFftDataCapture(Visualizer visualizer, byte[] fft, int samplingRate) {
-
                 Float mean = 0.0f;
                 Float absoluteMean = 0.0f;
                 Float [] Mean = new Float[8];

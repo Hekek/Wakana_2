@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     public static String EXTRA_DEVICE_ADDRESS;
     public static String BLUETOOTH_DEVICE_MAC = null;
 
-    private Switch wakanaSwitch;
+    private Switch senseSwitch;
     private Switch tremorSwitch;
 
     private Visualizer audioOutput = null;
@@ -41,27 +41,26 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Enable Wakana to start service
-        wakanaSwitch = (Switch) findViewById(R.id.wakanaSwitch);
-        wakanaSwitch.setChecked(false);
-        wakanaSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        senseSwitch = (Switch) findViewById(R.id.senseSwitch);
+        senseSwitch.setChecked(false);
+        senseSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
 
                 if (isChecked) {
-                    toast("Switch is currently ON");
+                    toast("Sense ON");
                     if (BLUETOOTH_DEVICE_MAC == null) {
                         toast("No Bluetooth Device Selected!");
-                        startVisualizer();
                     } else {
                         startCore();
-                        toast("Wakana Enabled");
+                        toast("Sense ON");
                     }
 
                 } else {
+                    toast("Sense OFF");
                     stopCore();
-                    stopVisualizer();
                 }
 
             }
@@ -76,18 +75,12 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
                 if (isChecked) {
-                    toast("Switch is currently ON");
-                    if (BLUETOOTH_DEVICE_MAC == null) {
-                        toast("No Bluetooth Device Selected!");
-                        startVisualizer();
-                    } else {
-                        startCore();
-                        toast("Wakana Enabled");
-                    }
+                    toast("Tremor ON");
+                    startTremor();
 
                 } else {
-                    stopCore();
-                    stopVisualizer();
+                    toast("Tremor OFF");
+                    stopTremor();
                 }
             }
         });
@@ -100,6 +93,14 @@ public class MainActivity extends AppCompatActivity {
     //STOP BACKGROUND SERVICE
     public void stopCore(){
         stopService(new Intent(this, CoreService.class));
+    }
+
+    public void startTremor(){
+        startService(new Intent(this, TremorService.class));
+    }
+
+    public void stopTremor(){
+        stopService(new Intent(this, TremorService.class));
     }
 
     @Override
@@ -147,12 +148,5 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
     }
 
-    private void startVisualizer(){
-        audioOutput.setEnabled(true);
-    }
-
-    private void stopVisualizer(){
-        audioOutput.setEnabled(false);
-    }
 
 }

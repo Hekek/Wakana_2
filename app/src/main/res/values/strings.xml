@@ -2,4 +2,6 @@
     <string name="app_name">Wakana</string>
     <string name="settings">Settings</string>
     <string name="action_settings">SETTINGS</string>
+    <string name="tremor">Tremor</string>
+    <string name="sense">Sense</string>
 </resources>
