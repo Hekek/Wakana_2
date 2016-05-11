@@ -29,8 +29,6 @@ public class TremorService extends Service {
     private int numChannels = 1;
     public boolean running = false;
     public byte[] data;
-    public static byte[] buffer;
-    public int buffersize;
 
 
 
