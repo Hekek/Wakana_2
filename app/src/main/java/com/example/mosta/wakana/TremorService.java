@@ -73,6 +73,7 @@ public class TremorService extends Service {
                             out.close();
                         }
                     }
+
                     out.close();
                 }catch (IOException e) {
                     System.err.println("I/O problems: " + e);
