@@ -5,8 +5,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
         android:allowBackup="true"
@@ -21,9 +22,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DeviceListActivity"></activity>
-        <service android:name=".CoreService"></service>
-        <service android:name=".TremorService"></service>
+        <activity android:name=".DeviceListActivity" />
+        <activity android:name=".Shazam"></activity>
+
+        <service android:name=".CoreService"/>
+        <service android:name=".TremorService"/>
+        <service android:name=".TremorElaborator"/>
+
     </application>
 
 </manifest>

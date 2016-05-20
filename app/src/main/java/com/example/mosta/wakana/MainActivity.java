@@ -103,16 +103,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            //case R.id.action_settings:
+            case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
-
-
-                //return true;
+                Intent i = new Intent(getApplicationContext(),Shazam.class);
+                startActivity(i);
+                return true;
 
             case R.id.action_favorite:
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
-                Intent i = new Intent(getApplicationContext(),DeviceListActivity.class);
+                i = new Intent(getApplicationContext(),DeviceListActivity.class);
                 startActivityForResult(i,PICK_CONTACT_REQUEST);
                 return true;
 
@@ -144,6 +144,4 @@ public class MainActivity extends AppCompatActivity {
     public void toast(String text){
         Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
     }
-
-
 }
