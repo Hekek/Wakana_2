@@ -61,6 +61,7 @@ public class TremorService extends Service {
                             //Log.i(TAG,"SIZE:"+out.size());
                             //Log.i(TAG,"RECOREDING....");
                         }
+                        //If Size of the Buffer is more than 176kb
                         if(out.size() > 176000){
                             contatore ++ ;
                             byte audio[] = out.toByteArray();
