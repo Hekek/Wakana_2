@@ -28,7 +28,6 @@
 
         <service android:name=".CoreService"/>
         <service android:name=".TremorService"/>
-        <service android:name=".TremorElaborator"/>
 
     </application>
 
