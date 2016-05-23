@@ -4,7 +4,9 @@ package com.example.mosta.wakana;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by mosta on 15/05/16.
@@ -19,6 +21,12 @@ public class TremorElaborator implements Runnable {
     double highscores[][];
     long points[][];
     public byte Audio[];
+    public boolean isMatching = false;
+    int songId = 0;
+
+    Map<Long, List<DataPoint>> hashMap;
+    Map<Integer, Map<Integer, Integer>> matchMap;   // Map<SongId, Map<Offset,
+                                                    // Count>>
 
     TremorElaborator(String name , byte[] audio){
         this.myName = name;
@@ -51,8 +59,6 @@ public class TremorElaborator implements Runnable {
         }
 
         highscores = new double[results.length][5];
-        //
-        //Arrays.fill(highscores,0);
         for(int i = 0;i < results.length;i++)
         {
             for(int j = 0;j < 5;j++)
@@ -84,6 +90,35 @@ public class TremorElaborator implements Runnable {
             }
             //Log.i(TAG,points[t][0]+"-"+points[t][1]+"-"+points[t][2]+"-"+points[t][3]+"-"+points[t][4]);
             long h = hash(points[t][0], points[t][1], points[t][2], points[t][3]);
+
+            //IF i am matching sound
+            if (isMatching)
+            {
+                //Create a list of DP(songid,time)
+                List<DataPoint> listPoints;
+                //If i found the hash in my hashmap
+                if((listPoints = hashMap.get(h)) != null)
+                {
+
+                }
+            }
+            //else add new sound into database
+            else
+            {
+                List<DataPoint> listPoints = null;
+                if((listPoints = hashMap.get(h)) == null)
+                {
+                    listPoints = new ArrayList<DataPoint>();
+                    DataPoint point = new DataPoint((int) songId, t);
+                    listPoints.add(point);
+                    hashMap.put(h, listPoints);
+                }
+                else
+                {
+                    DataPoint Point = new DataPoint((int) songId,t);
+                    listPoints.add(Point);
+                }
+            }
         }
     }
     // find out in which range is frequency
