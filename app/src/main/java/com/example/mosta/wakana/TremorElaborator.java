@@ -1,9 +1,13 @@
 package com.example.mosta.wakana;
 
 
+import android.os.Environment;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +27,10 @@ public class TremorElaborator implements Runnable {
     public byte Audio[];
     public boolean isMatching = false;
     int songId = 0;
-
+    public String filename = "KeyPoints.txt";
+    FileOutputStream outputStream;
+    public String HASHES = null;
+    ArrayList<Long> Hashes = new ArrayList<>();
     Map<Long, List<DataPoint>> hashMap;
     Map<Integer, Map<Integer, Integer>> matchMap;   // Map<SongId, Map<Offset,
                                                     // Count>>
@@ -90,36 +97,37 @@ public class TremorElaborator implements Runnable {
             }
             //Log.i(TAG,points[t][0]+"-"+points[t][1]+"-"+points[t][2]+"-"+points[t][3]+"-"+points[t][4]);
             long h = hash(points[t][0], points[t][1], points[t][2], points[t][3]);
+            //Log.d(TAG, "HASH:"+h);
+            String test = ""+h;
+            Hashes.add(h);
+            HASHES += " "+h+"\n";
 
-            //IF i am matching sound
-            if (isMatching)
-            {
-                //Create a list of DP(songid,time)
-                List<DataPoint> listPoints;
-                //If i found the hash in my hashmap
-                if((listPoints = hashMap.get(h)) != null)
-                {
-
-                }
-            }
-            //else add new sound into database
-            else
-            {
-                List<DataPoint> listPoints = null;
-                if((listPoints = hashMap.get(h)) == null)
-                {
-                    listPoints = new ArrayList<DataPoint>();
-                    DataPoint point = new DataPoint((int) songId, t);
-                    listPoints.add(point);
-                    hashMap.put(h, listPoints);
-                }
-                else
-                {
-                    DataPoint Point = new DataPoint((int) songId,t);
-                    listPoints.add(Point);
-                }
-            }
         }
+        //Control if there is a repeated key
+        /*for (int i = 0 ; i<Hashes.size() ; i++)
+        {
+            int duplicated = 0;
+            for (int j = 0 ; j<Hashes.size() ; j++)
+            {
+                if (Hashes.get(i) == Hashes.get(j)){
+                    duplicated++;
+                }
+            }
+            if (duplicated > 1){
+                Log.d(TAG, "REPEATED:"+Hashes.get(i)+" Times:"+duplicated);
+            }
+        }*/
+        try {
+            File myFile = new File(Environment.getExternalStorageDirectory().getPath(),"HASHES.txt");
+            FileOutputStream fOut = new FileOutputStream(myFile,true);
+            OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+            myOutWriter.append(HASHES);
+            myOutWriter.close();
+            fOut.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG, "HAKUNA:"+HASHES);
     }
     // find out in which range is frequency
     public int getIndex(int freq) {
