@@ -25,7 +25,6 @@ public class TremorElaborator implements Runnable {
     double highscores[][];
     long points[][];
     public byte Audio[];
-    int songId = 0;
     public String HASHES ="";
     ArrayList<Long> Hashes = new ArrayList<>();
     Map<Long, List<DataPoint>> hashMap;
@@ -43,7 +42,6 @@ public class TremorElaborator implements Runnable {
         System.out.println(myName + ")Finished");
     }
     public void elaborate(){
-        Log.i(TAG,"ANALYZE");
         final int totalSize = Audio.length;
         Log.i(TAG,"Total Size Of data: "+totalSize);
         int amountPossible = totalSize/CHUNK_SIZE;
@@ -63,7 +61,7 @@ public class TremorElaborator implements Runnable {
         }
 
         highscores = new double[results.length][5];
-        /*for(int i = 0;i < results.length;i++)
+        /*for(int i = 0;i < results.length;i+a+)
         {
             for(int j = 0;j < 5;j++)
             {
@@ -92,11 +90,17 @@ public class TremorElaborator implements Runnable {
                     points[t][index] = freq;
                 }
             }
-            //Log.i(TAG,points[t][0]+"-"+points[t][1]+"-"+points[t][2]+"-"+points[t][3]+"-"+points[t][4]);
             long h = hash(points[t][0], points[t][1], points[t][2], points[t][3]);
-            //Log.d(TAG, "HASH:"+h);
-            String test = ""+h;
-            Hashes.add(h);
+            //Hashes.add(h);
+            String control = ""+h;
+            long z = 12811007436L;
+            if (h == z )
+            {
+                Log.d(TAG, "AMBULANZA\n " +
+                          "AMBULANZA\n" +
+                           " AMBULANZA\n" +
+                          " AMBULANZA");
+            }
             HASHES += ""+h+"\n";
         }
         try {
@@ -109,7 +113,7 @@ public class TremorElaborator implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Log.d(TAG, "HAKUNA:"+HASHES);
+        //Log.d(TAG, HASHES);
     }
     // find out in which range is frequency
     public int getIndex(int freq) {
