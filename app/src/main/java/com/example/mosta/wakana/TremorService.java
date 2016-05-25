@@ -5,13 +5,16 @@ import android.content.Intent;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,6 +51,18 @@ public class TremorService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG,"Tremor Started");
         Log.i(TAG,"BUFF:"+bufferSize);
+        try
+        {
+            String root = Environment.getExternalStorageDirectory().getPath();
+            File file = new File(root,"HASHES.txt");
+            if(file.exists())
+                file.delete();
+            /*PrintWriter writer = new PrintWriter(Environment.getExternalStorageDirectory().getPath(),"/HASHES.txt");
+            writer.print("");
+            writer.close();*/
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         recorder.startRecording();
 
         new Thread(new Runnable(){
@@ -62,7 +77,7 @@ public class TremorService extends Service {
                             //Log.i(TAG,"RECOREDING....");
                         }
                         //If Size of the Buffer is more than 176kb
-                        if(out.size() > 176000){
+                        if(out.size() > 176000){//176000
                             contatore ++ ;
                             byte audio[] = out.toByteArray();
                             Log.i(TAG,"Analyze("+contatore+")");
@@ -84,10 +99,6 @@ public class TremorService extends Service {
 
         }).start();
         return super.onStartCommand(intent , flags , startId);
-    }
-
-    public void Init(){
-
     }
 
     @Override
