@@ -14,7 +14,6 @@ import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,15 +50,13 @@ public class TremorService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG,"Tremor Started");
         Log.i(TAG,"BUFF:"+bufferSize);
+        //DELETE OLD SAVED HASHES
         try
         {
             String root = Environment.getExternalStorageDirectory().getPath();
             File file = new File(root,"HASHES.txt");
             if(file.exists())
                 file.delete();
-            /*PrintWriter writer = new PrintWriter(Environment.getExternalStorageDirectory().getPath(),"/HASHES.txt");
-            writer.print("");
-            writer.close();*/
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -73,11 +70,10 @@ public class TremorService extends Service {
                         int count = recorder.read(buffer, 0, bufferSize);
                         if (count > 0) {
                             out.write(buffer, 0, count);
-                            //Log.i(TAG,"SIZE:"+out.size());
-                            //Log.i(TAG,"RECOREDING....");
                         }
                         //If Size of the Buffer is more than 176kb
-                        if(out.size() > 176000){//176000
+                        if(out.size() > 176000)
+                        {
                             contatore ++ ;
                             byte audio[] = out.toByteArray();
                             Log.i(TAG,"Analyze("+contatore+")");
