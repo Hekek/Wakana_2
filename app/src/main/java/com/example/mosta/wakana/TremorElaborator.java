@@ -25,11 +25,8 @@ public class TremorElaborator implements Runnable {
     double highscores[][];
     long points[][];
     public byte Audio[];
-    public boolean isMatching = false;
     int songId = 0;
-    public String filename = "KeyPoints.txt";
-    FileOutputStream outputStream;
-    public String HASHES = null;
+    public String HASHES ="";
     ArrayList<Long> Hashes = new ArrayList<>();
     Map<Long, List<DataPoint>> hashMap;
     Map<Integer, Map<Integer, Integer>> matchMap;   // Map<SongId, Map<Offset,
@@ -66,21 +63,21 @@ public class TremorElaborator implements Runnable {
         }
 
         highscores = new double[results.length][5];
-        for(int i = 0;i < results.length;i++)
+        /*for(int i = 0;i < results.length;i++)
         {
             for(int j = 0;j < 5;j++)
             {
                 highscores[i][j] = 0;
             }
-        }
+        }*/
         points = new long[results.length][5];
-        for(int i = 0;i < results.length;i++)
+        /*for(int i = 0;i < results.length;i++)
         {
             for(int j = 0;j < 5;j++)
             {
                 points[i][j] = 0;
             }
-        }
+        }*/
         for (int t = 0 ; t < results.length ; t++){
             for (int freq = 30; freq < 300-1; freq++) {
                 //Get the magnitude:
@@ -100,23 +97,8 @@ public class TremorElaborator implements Runnable {
             //Log.d(TAG, "HASH:"+h);
             String test = ""+h;
             Hashes.add(h);
-            HASHES += " "+h+"\n";
-
+            HASHES += ""+h+"\n";
         }
-        //Control if there is a repeated key
-        /*for (int i = 0 ; i<Hashes.size() ; i++)
-        {
-            int duplicated = 0;
-            for (int j = 0 ; j<Hashes.size() ; j++)
-            {
-                if (Hashes.get(i) == Hashes.get(j)){
-                    duplicated++;
-                }
-            }
-            if (duplicated > 1){
-                Log.d(TAG, "REPEATED:"+Hashes.get(i)+" Times:"+duplicated);
-            }
-        }*/
         try {
             File myFile = new File(Environment.getExternalStorageDirectory().getPath(),"HASHES.txt");
             FileOutputStream fOut = new FileOutputStream(myFile,true);
