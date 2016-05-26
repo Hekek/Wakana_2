@@ -59,7 +59,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public long createSample(String label, String hash){
+    public long createSample(String hash, String label){
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
