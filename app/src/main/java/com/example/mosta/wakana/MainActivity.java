@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private Switch senseSwitch;
     private Switch tremorSwitch;
 
+    private DatabaseHelper database;
+
 
     private static final String TAG = "CORE";
 
@@ -36,6 +38,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        database = new DatabaseHelper(getBaseContext());
+
+        loadAmbulance();
 
         //Enable Wakana to start service
         senseSwitch = (Switch) findViewById(R.id.senseSwitch);
@@ -139,6 +145,21 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.settings, menu);
         return true;
+    }
+
+    public void loadAmbulance(){
+        if (!database.soundExist("Ambulance")){
+            database.createSample("12811007436","Ambulance");
+            database.createSample("15409206230","Ambulance");
+            database.createSample("12809207436","Ambulance");
+            database.createSample("12811007236","Ambulance");
+            database.createSample("14611007436","Ambulance");
+            database.createSample("14609207436","Ambulance");
+            database.createSample("12809207236","Ambulance");
+            database.createSample("12811005436","Ambulance");
+            database.createSample("14611007236","Ambulance");
+            database.createSample("12809205436","Ambulance");
+        }
     }
 
     public void toast(String text){
