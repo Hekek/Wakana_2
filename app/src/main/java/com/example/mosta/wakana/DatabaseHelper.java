@@ -91,6 +91,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return samples;
     }
 
+    public boolean soundExist(String label){
+        String query = "SELECT * FROM "+ TABLE_SAMPLE +" WHERE "+ KEY_LABEL + "='" + label +"'";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+
+        if (c.moveToFirst()){
+            return true;
+        }
+        else return false;
+    }
+
     public void closeDB() {
         SQLiteDatabase db = this.getReadableDatabase();
         if (db != null && db.isOpen())
