@@ -103,6 +103,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         else return false;
     }
 
+    public boolean hashExist(String hash){
+        String query = "SELECT * FROM "+ TABLE_SAMPLE +" WHERE "+ KEY_HASH +"='"+ hash +"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        if (c.moveToFirst()){
+            return true;
+        }
+        else return false;
+    }
+
+    public String getLabel(String hash){
+        String query = "SELECT * FROM "+ TABLE_SAMPLE +" WHERE "+ KEY_HASH +"='"+ hash +"'";
+        String label = "";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+        if (c.moveToFirst()){
+            do{
+                label = c.getString(c.getColumnIndex(KEY_LABEL));
+            }while (c.moveToNext());
+        }
+        return label;
+    }
+
     public void closeDB() {
         SQLiteDatabase db = this.getReadableDatabase();
         if (db != null && db.isOpen())
