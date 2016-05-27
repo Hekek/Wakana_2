@@ -1,7 +1,11 @@
 package com.example.mosta.wakana;
 
 
+import android.app.NotificationManager;
+import android.content.Context;
+import android.graphics.SurfaceTexture;
 import android.os.Environment;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -20,28 +24,38 @@ public class TremorElaborator implements Runnable {
     private String myName;
     public final int[] RANGE = new int[] { 40, 80, 120, 180, 301 };
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    int CHUNK_SIZE = 4096;
+    private final int CHUNK_SIZE = 4096;
     private static final int FUZ_FACTOR = 2;
     double highscores[][];
     long points[][];
     public byte Audio[];
     public String HASHES ="";
-    ArrayList<Long> Hashes = new ArrayList<>();
-    Map<Long, List<DataPoint>> hashMap;
-    Map<Integer, Map<Integer, Integer>> matchMap;   // Map<SongId, Map<Offset,
-                                                    // Count>>
+    private DatabaseHelper database;
+    private Context mContext;
 
-    TremorElaborator(String name , byte[] audio){
+
+
+
+    TremorElaborator(String name , byte[] audio , Context context){
         this.myName = name;
         this.Audio = audio;
+        mContext = context;
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(mContext)
+                        .setSmallIcon(R.drawable.ic_settings)
+                        .setContentTitle("ALLERT WAKANA")
+                        .setContentText("SOUND DETECTED");
+
     }
 
     @Override
     public void run(){
+        database = new DatabaseHelper(mContext);
         elaborate();
         System.out.println(myName + ")Finished");
     }
     public void elaborate(){
+
         final int totalSize = Audio.length;
         Log.i(TAG,"Total Size Of data: "+totalSize);
         int amountPossible = totalSize/CHUNK_SIZE;
@@ -59,23 +73,8 @@ public class TremorElaborator implements Runnable {
             //Perform FFT analysis on the chunk:
             results[times] = FFT.fft(complex);
         }
-
         highscores = new double[results.length][5];
-        /*for(int i = 0;i < results.length;i+a+)
-        {
-            for(int j = 0;j < 5;j++)
-            {
-                highscores[i][j] = 0;
-            }
-        }*/
         points = new long[results.length][5];
-        /*for(int i = 0;i < results.length;i++)
-        {
-            for(int j = 0;j < 5;j++)
-            {
-                points[i][j] = 0;
-            }
-        }*/
         for (int t = 0 ; t < results.length ; t++){
             for (int freq = 30; freq < 300-1; freq++) {
                 //Get the magnitude:
@@ -92,14 +91,11 @@ public class TremorElaborator implements Runnable {
             }
             long h = hash(points[t][0], points[t][1], points[t][2], points[t][3]);
             //Hashes.add(h);
-            String control = ""+h;
-            long z = 12811007436L;
-            if (h == z )
+            String hash = ""+h;
+            if (database.hashExist(hash))
             {
-                Log.d(TAG, "AMBULANZA\n " +
-                          "AMBULANZA\n" +
-                           " AMBULANZA\n" +
-                          " AMBULANZA");
+                System.out.println("NOTIFY:"+database.getLabel(hash));
+
             }
             HASHES += ""+h+"\n";
         }
