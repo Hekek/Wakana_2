@@ -105,15 +105,15 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 // User chose the "Settings" item, show the app settings UI...
-                Intent i = new Intent(getApplicationContext(),Shazam.class);
-                startActivity(i);
+                Intent i = new Intent(getApplicationContext(),DeviceListActivity.class);
+                startActivityForResult(i,PICK_CONTACT_REQUEST);
                 return true;
 
             case R.id.action_favorite:
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
-                i = new Intent(getApplicationContext(),DeviceListActivity.class);
-                startActivityForResult(i,PICK_CONTACT_REQUEST);
+                i = new Intent(getApplicationContext(),AddSoundActivity.class);
+                startActivity(i);
                 return true;
 
             default:
