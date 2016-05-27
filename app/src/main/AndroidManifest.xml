@@ -3,7 +3,7 @@
     package="com.example.mosta.wakana">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -24,10 +24,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".DeviceListActivity" />
-        <activity android:name=".Shazam"></activity>
-
-        <service android:name=".CoreService"/>
-        <service android:name=".TremorService"/>
+        <activity android:name=".AddSoundActivity"></activity>
+        <service android:name=".CoreService" />
+        <service android:name=".TremorService" />
 
     </application>
 
