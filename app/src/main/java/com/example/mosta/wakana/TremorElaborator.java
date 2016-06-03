@@ -1,20 +1,16 @@
 package com.example.mosta.wakana;
 
 
-import android.app.NotificationManager;
+
 import android.content.Context;
-import android.graphics.SurfaceTexture;
+import android.content.Intent;
 import android.os.Environment;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by mosta on 15/05/16.
@@ -31,7 +27,7 @@ public class TremorElaborator implements Runnable {
     public byte Audio[];
     public String HASHES ="";
     private DatabaseHelper database;
-    private Context mContext;
+    public Context mContext;
 
 
 
@@ -40,11 +36,6 @@ public class TremorElaborator implements Runnable {
         this.myName = name;
         this.Audio = audio;
         mContext = context;
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(mContext)
-                        .setSmallIcon(R.drawable.ic_settings)
-                        .setContentTitle("ALLERT WAKANA")
-                        .setContentText("SOUND DETECTED");
 
     }
 
@@ -95,7 +86,8 @@ public class TremorElaborator implements Runnable {
             if (database.hashExist(hash))
             {
                 System.out.println("NOTIFY:"+database.getLabel(hash));
-
+                Intent intent=new Intent(mContext,Notifications.class);
+                mContext.startService(intent);
             }
             HASHES += ""+h+"\n";
         }
