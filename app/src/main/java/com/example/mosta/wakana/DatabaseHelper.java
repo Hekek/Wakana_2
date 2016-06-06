@@ -6,7 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by mosta on 26/05/16.
@@ -108,9 +110,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(query, null);
         if (c.moveToFirst()){
+            System.out.println(c.toString());
             return true;
         }
         else return false;
+    }
+
+    public List<String> getListLabels(){
+        List<String> listlabel = new ArrayList<>();
+        String query = "SELECT label FROM "+ TABLE_SAMPLE +" GROUP BY label";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query,null);
+        // looping through array
+        if (c.moveToFirst()){
+            do{
+                String label = c.getString(c.getColumnIndex(KEY_LABEL));
+                // add to hashmap
+                listlabel.add(label);
+            }while (c.moveToNext());
+        }
+        return listlabel;
     }
 
     public String getLabel(String hash){
