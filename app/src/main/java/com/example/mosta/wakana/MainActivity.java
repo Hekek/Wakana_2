@@ -19,10 +19,12 @@ import android.widget.Toast;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity {
 
-    static final int PICK_CONTACT_REQUEST = 1;
+    private static final int PICK_CONTACT_REQUEST = 1;
     public static String EXTRA_DEVICE_ADDRESS;
     public static String BLUETOOTH_DEVICE_MAC = null;
 
@@ -122,6 +124,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
                 return true;
 
+            case R.id.action_sounds:
+
+                i = new Intent(getApplicationContext(),ManageSounds.class);
+                startActivity(i);
+
             default:
                 // If we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.
@@ -159,6 +166,23 @@ public class MainActivity extends AppCompatActivity {
             database.createSample("12811005436","Ambulance");
             database.createSample("14611007236","Ambulance");
             database.createSample("12809205436","Ambulance");
+
+            databasetoString();
+        }
+    }
+
+    public void databasetoString(){
+        //PRINT DATABASE
+        HashMap<String,String> samples = database.getAllSamples();
+        System.out.println("Size: " + samples.size());
+        Iterator<String> iterator = samples.keySet().iterator();
+
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+
+            String value = samples.get(key).toString();
+
+            System.out.println(key + " " + value);
         }
     }
 
