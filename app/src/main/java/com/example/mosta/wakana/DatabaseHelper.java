@@ -145,6 +145,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return label;
     }
 
+    public void removeSound(String label){
+        String query = "DELETE FROM "+ TABLE_SAMPLE +" WHERE "+ KEY_LABEL +"='"+ label +"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(query, null);
+    }
+
     public void closeDB() {
         SQLiteDatabase db = this.getReadableDatabase();
         if (db != null && db.isOpen())
