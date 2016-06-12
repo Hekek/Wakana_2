@@ -3,9 +3,11 @@ package com.example.mosta.wakana;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -146,9 +148,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void removeSound(String label){
-        String query = "DELETE FROM "+ TABLE_SAMPLE +" WHERE "+ KEY_LABEL +"='"+ label +"'";
+        String query = "DELETE FROM "+ TABLE_SAMPLE +" WHERE "+ KEY_LABEL +" = '"+ label +"'";
+        System.out.println(query);
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(query, null);
+        if (c.moveToFirst()){
+            System.out.println("DONE");
+
+        }
     }
 
     public void closeDB() {
