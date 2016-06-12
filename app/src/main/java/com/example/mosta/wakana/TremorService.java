@@ -24,15 +24,15 @@ import java.util.concurrent.Executors;
  */
 public class TremorService extends Service {
     public String TAG = "TREMOR SERVICE";
-    private int GFreqSize = 448;
-    private int GFreq = 8;
+    private static int GFreqSize = 448;
+    private static int GFreq = 8;
     boolean isRecording = true;
     public final int[] RANGE = new int[] { 40, 80, 120, 180, 301 };
     final int bufferSize = 4096;//AudioRecord.getMinBufferSize(44100,AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
     final AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
     final byte[] buffer = new byte[bufferSize];
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    int CHUNK_SIZE = 4096;
+    private static int CHUNK_SIZE = 4096;
     private static final int FUZ_FACTOR = 2;
     double highscores[][];
     long points[][];
@@ -72,12 +72,12 @@ public class TremorService extends Service {
                             out.write(buffer, 0, count);
                         }
                         //If Size of the Buffer is more than 176kb
-                        if(out.size() > 176000)
+                        if(out.size() > 22000)//176000)
                         {
                             contatore ++ ;
                             byte audio[] = out.toByteArray();
                             Log.i(TAG,"Analyze("+contatore+")");
-                            Runnable taskOne = new TremorElaborator("TASK"+contatore,audio);
+                            Runnable taskOne = new TremorElaborator("TASK"+contatore,audio,getBaseContext());
                             executor.execute(taskOne);
                             //elaborate();
                             out.reset();
