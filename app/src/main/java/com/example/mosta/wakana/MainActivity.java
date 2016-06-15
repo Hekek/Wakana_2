@@ -5,6 +5,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.media.MediaPlayer;
+import android.media.audiofx.PresetReverb;
 import android.media.audiofx.Visualizer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,8 +13,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.nio.ByteBuffer;
@@ -33,8 +37,15 @@ public class MainActivity extends AppCompatActivity {
 
     private DatabaseHelper database;
 
+    private ProgressBar mybar;
+
+    private TextView Yuri;
+
+    private View shapee;
 
     private static final String TAG = "CORE";
+
+    private boolean Tremor=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +54,23 @@ public class MainActivity extends AppCompatActivity {
 
         database = new DatabaseHelper(getBaseContext());
 
+        mybar = (ProgressBar) findViewById(R.id.progressBar);
+        //mybar.setIndeterminate(true);
+        /*mybar.getIndeterminateDrawable().setColorFilter(
+                getResources().getColor(R.color.PBar),
+                android.graphics.PorterDuff.Mode.SRC_IN);*/
+        mybar.setVisibility(View.INVISIBLE);
+        //LOAD DEAFAULT SOUND
         loadAmbulance();
+        loadBell();
+
+        shapee = (View) findViewById(R.id.myRectangleView);
+
 
         //Enable Wakana to start service
         senseSwitch = (Switch) findViewById(R.id.senseSwitch);
         senseSwitch.setChecked(false);
+        senseSwitch.setVisibility(View.INVISIBLE);
         senseSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
             @Override
@@ -74,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         //Tremor Switch
         tremorSwitch = (Switch) findViewById(R.id.tremorSwitch);
         tremorSwitch.setChecked(false);
+        tremorSwitch.setVisibility(View.INVISIBLE);
         tremorSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
             @Override
@@ -89,6 +113,25 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+    }
+
+    public void yuri_action(View v){
+        Yuri = (TextView) findViewById(R.id.btn_yuri);
+        if (!Tremor) {
+            startTremor();
+            mybar.setVisibility(View.VISIBLE);
+            Tremor = true;
+            Yuri.setText("Stop");
+            shapee.setVisibility(View.INVISIBLE);
+
+        } else {
+            stopTremor();
+            mybar.setVisibility(View.INVISIBLE);
+            Tremor=false;
+            Yuri.setText("Start");
+            shapee.setVisibility(View.VISIBLE);
+        }
     }
 
     //START BACKGROUND SERVICE
@@ -116,18 +159,23 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(getApplicationContext(),DeviceListActivity.class);
                 startActivityForResult(i,PICK_CONTACT_REQUEST);
                 return true;
-
+            /*
             case R.id.action_favorite:
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
                 i = new Intent(getApplicationContext(),AddSoundActivity.class);
                 startActivity(i);
-                return true;
+                return true;*/
 
             case R.id.action_sounds:
-
                 i = new Intent(getApplicationContext(),ManageSounds.class);
                 startActivity(i);
+                return true;
+
+            case R.id.action_addsounds:
+                i = new Intent(getApplicationContext(),AddSoundActivity.class);
+                startActivity(i);
+                return true;
 
             default:
                 // If we got here, the user's action was not recognized.
@@ -166,10 +214,26 @@ public class MainActivity extends AppCompatActivity {
             database.createSample("12811005436","Ambulance");
             database.createSample("14611007236","Ambulance");
             database.createSample("12809205436","Ambulance");
-
             databasetoString();
         }
     }
+
+    public void loadBell(){
+        if (!database.soundExist("Bell")){
+            database.createSample("16211407032","Bell");
+            database.createSample("16211407232","Bell");
+            database.createSample("16211407034","Bell");
+            database.createSample("16211407234","Bell");
+            database.createSample("16211407030","Bell");
+            database.createSample("16211407230","Bell");
+            database.createSample("16211407036","Bell");
+            database.createSample("16211207032","Bell");
+            database.createSample("16211207232","Bell");
+            database.createSample("16211407236","Bell");
+            databasetoString();
+        }
+    }
+
 
     public void databasetoString(){
         //PRINT DATABASE
