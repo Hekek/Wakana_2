@@ -16,15 +16,31 @@ public class Notifications extends Service {
     public Notifications() {
     }
 
+    public String label;
+
     @Override
     public void onCreate() {
         super.onCreate();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Vibrator v = (Vibrator) getBaseContext().getSystemService(getApplicationContext().VIBRATOR_SERVICE);
+        v.vibrate(500);
+        label = intent.getStringExtra("LABEL");
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_settings)
-                        .setContentTitle("My notification")
-                        .setContentText("Hello World!");
+                        .setContentTitle(label)
+                        .setContentText("WARNING");
         Intent resultIntent = new Intent(this, MainActivity.class);
+
+        PendingIntent contentIntent = PendingIntent.getActivity(
+                getApplicationContext(),
+                0,
+                new Intent(),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 
@@ -42,13 +58,6 @@ public class Notifications extends Service {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         mNotificationManager.notify(1, mBuilder.build());
-
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Vibrator v = (Vibrator) getBaseContext().getSystemService(getApplicationContext().VIBRATOR_SERVICE);
-        v.vibrate(500);
 
         return super.onStartCommand(intent , flags , startId);
     }
