@@ -1,12 +1,21 @@
 package com.example.mosta.wakana;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.media.MediaPlayer;
 import android.media.audiofx.PresetReverb;
 import android.media.audiofx.Visualizer;
+import android.os.Environment;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +29,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Arrays;
@@ -31,9 +41,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int PICK_CONTACT_REQUEST = 1;
     public static String EXTRA_DEVICE_ADDRESS;
     public static String BLUETOOTH_DEVICE_MAC = null;
-
-    private Switch senseSwitch;
-    private Switch tremorSwitch;
 
     private DatabaseHelper database;
 
@@ -47,12 +54,15 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean Tremor=false;
 
+    public String lastnotify = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         database = new DatabaseHelper(getBaseContext());
+        CreateYuriDirectory();
 
         mybar = (ProgressBar) findViewById(R.id.progressBar);
         //mybar.setIndeterminate(true);
@@ -68,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Enable Wakana to start service
-        senseSwitch = (Switch) findViewById(R.id.senseSwitch);
+        Switch senseSwitch = (Switch) findViewById(R.id.senseSwitch);
         senseSwitch.setChecked(false);
         senseSwitch.setVisibility(View.INVISIBLE);
         senseSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -95,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Tremor Switch
-        tremorSwitch = (Switch) findViewById(R.id.tremorSwitch);
+        Switch tremorSwitch = (Switch) findViewById(R.id.tremorSwitch);
         tremorSwitch.setChecked(false);
         tremorSwitch.setVisibility(View.INVISIBLE);
         tremorSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -113,9 +123,52 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                new IntentFilter("my-event"));
+    }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Extract data included in the Intent
+            String message = intent.getStringExtra("SOUND");
+            if (!message.equals(lastnotify))
+            {
+                lastnotify = message;
+                Notify(message);
+            }
+        }
+    };
+
+    @Override
+    protected void onPause(){
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        //GET NOTIFICATION when app in background
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                new IntentFilter("my-event"));
+        super.onPause();
+    }
+
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        System.out.println("STOP CLOSED");
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        System.out.println("CLOSED");
+
+    }
+    // Yuri start
     public void yuri_action(View v){
         Yuri = (TextView) findViewById(R.id.btn_yuri);
         if (!Tremor) {
@@ -252,5 +305,36 @@ public class MainActivity extends AppCompatActivity {
 
     public void toast(String text){
         Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+    }
+
+    public void Notify(String label){
+        if (label==null)
+            onDestroy();
+        PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(), 0);
+        Notification notification = new NotificationCompat.Builder(this)
+                .setTicker("Yuri")
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setContentTitle("Yuri")
+                .setContentText(label)
+                .setContentIntent(pi)
+                .setAutoCancel(true)
+                .build();
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
+        notificationManager.notify(0, notification);
+    }
+
+    public void CreateYuriDirectory(){
+        File dir = new File(Environment.getExternalStorageDirectory().getPath()+"/Yuri");
+        try{
+            if(dir.mkdir()) {
+                System.out.println("Directory created");
+            } else {
+                System.out.println("Directory is not created");
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 }
