@@ -7,18 +7,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioTrack;
-import android.media.MediaPlayer;
-import android.media.audiofx.PresetReverb;
-import android.media.audiofx.Visualizer;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,9 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -65,10 +55,6 @@ public class MainActivity extends AppCompatActivity {
         CreateYuriDirectory();
 
         mybar = (ProgressBar) findViewById(R.id.progressBar);
-        //mybar.setIndeterminate(true);
-        /*mybar.getIndeterminateDrawable().setColorFilter(
-                getResources().getColor(R.color.PBar),
-                android.graphics.PorterDuff.Mode.SRC_IN);*/
         mybar.setVisibility(View.INVISIBLE);
         //LOAD DEAFAULT SOUND
         loadAmbulance();
@@ -204,24 +190,12 @@ public class MainActivity extends AppCompatActivity {
         stopService(new Intent(this, TremorService.class));
     }
 
+    // THIS IS THE MENU SETUP
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                // User chose the "Settings" item, show the app settings UI...
-                Intent i = new Intent(getApplicationContext(),DeviceListActivity.class);
-                startActivityForResult(i,PICK_CONTACT_REQUEST);
-                return true;
-            /*
-            case R.id.action_favorite:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
-                i = new Intent(getApplicationContext(),AddSoundActivity.class);
-                startActivity(i);
-                return true;*/
-
             case R.id.action_sounds:
-                i = new Intent(getApplicationContext(),ManageSounds.class);
+                Intent i = new Intent(getApplicationContext(),ManageSounds.class);
                 startActivity(i);
                 return true;
 
