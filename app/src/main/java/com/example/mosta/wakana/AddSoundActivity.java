@@ -126,7 +126,7 @@ public class AddSoundActivity extends AppCompatActivity {
                     executor.shutdown();
 
                     //Get data from file and add them to a list
-                    String root = Environment.getExternalStorageDirectory().getPath();
+                    String root = Environment.getExternalStorageDirectory().getPath()+"/Yuri";
                     File file = new File(root, "HASHES.txt");
                     try {
                         BufferedReader br = new BufferedReader(new FileReader(file));

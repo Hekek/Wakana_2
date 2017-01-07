@@ -1,14 +1,17 @@
 package com.example.mosta.wakana;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.IBinder;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
 
@@ -16,6 +19,7 @@ public class Notifications extends Service {
     public Notifications() {
     }
 
+    public int id = 0;
     public String label;
 
     @Override
@@ -26,38 +30,12 @@ public class Notifications extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Vibrator v = (Vibrator) getBaseContext().getSystemService(getApplicationContext().VIBRATOR_SERVICE);
-        v.vibrate(500);
         label = intent.getStringExtra("LABEL");
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_settings)
-                        .setContentTitle(label)
-                        .setContentText("WARNING");
-        Intent resultIntent = new Intent(this, MainActivity.class);
-
-        PendingIntent contentIntent = PendingIntent.getActivity(
-                getApplicationContext(),
-                0,
-                new Intent(),
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-
-        stackBuilder.addParentStack(MainActivity.class);
-
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-
-        mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        mNotificationManager.notify(1, mBuilder.build());
+        v.vibrate(300);
+        Intent i = new Intent("my-event");
+        // add data
+        i.putExtra("SOUND", label);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(i);
 
         return super.onStartCommand(intent , flags , startId);
     }
@@ -65,12 +43,30 @@ public class Notifications extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public void Notify(String label){
+        if (label==null)
+            onDestroy();
+        PendingIntent pi = PendingIntent.getActivity(this, 0, new Intent(), 0);
+        Notification notification = new NotificationCompat.Builder(this)
+                .setTicker("Yuri")
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setContentTitle("Yuri")
+                .setContentText(label)
+                .setContentIntent(pi)
+                .setAutoCancel(true)
+                .build();
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
+        notificationManager.notify(0, notification);
+
     }
 }

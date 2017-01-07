@@ -14,7 +14,8 @@
         android:layout_height="wrap_content"
         android:text="Start Recording"
         android:id="@+id/btn_record"
-        android:layout_alignParentTop="true"
+        android:layout_marginBottom="43dp"
+        android:layout_above="@+id/btn_save"
         android:layout_centerHorizontal="true" />
 
     <Button
@@ -22,36 +23,35 @@
         android:layout_height="wrap_content"
         android:text="Stop Recording"
         android:id="@+id/btn_stoprecord"
-        android:layout_below="@+id/btn_record"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/btn_record"
+        android:layout_alignEnd="@+id/btn_record" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txtview_log"
-        android:layout_marginTop="70dp"
-        android:layout_below="@+id/btn_save"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:text="LOG LOG LOG LOG LOG "
+        android:layout_below="@+id/btn_stoprecord"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="54dp" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txtfield_soundlabel"
-        android:layout_below="@+id/btn_stoprecord"
-        android:layout_marginTop="41dp"
-        android:layout_alignRight="@+id/btn_stoprecord"
-        android:layout_alignEnd="@+id/btn_stoprecord"
-        android:layout_alignLeft="@+id/btn_stoprecord"
-        android:layout_alignStart="@+id/btn_stoprecord" />
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save"
         android:id="@+id/btn_save"
-        android:layout_below="@+id/txtfield_soundlabel"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -26,13 +26,16 @@
         </activity>
         <activity android:name=".DeviceListActivity" />
         <activity android:name=".AddSoundActivity" />
+        <activity android:name=".ManageSounds" />
 
         <service android:name=".CoreService" />
         <service android:name=".TremorService" />
         <service
             android:name=".Notifications"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".ManageSound"></activity>
     </application>
 
 </manifest>

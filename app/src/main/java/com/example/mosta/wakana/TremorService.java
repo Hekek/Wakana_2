@@ -53,7 +53,7 @@ public class TremorService extends Service {
         //DELETE OLD SAVED HASHES
         try
         {
-            String root = Environment.getExternalStorageDirectory().getPath();
+            String root = Environment.getExternalStorageDirectory().getPath()+"/Yuri";
             File file = new File(root,"HASHES.txt");
             if(file.exists())
                 file.delete();
@@ -71,6 +71,7 @@ public class TremorService extends Service {
                         if (count > 0) {
                             out.write(buffer, 0, count);
                         }
+                        //System.out.println(FileSize(Environment.getExternalStorageDirectory().getPath()+"HASHES.txt"));
                         //If Size of the Buffer is more than 176kb
                         if(out.size() > 22000)//176000)
                         {
@@ -244,5 +245,11 @@ public class TremorService extends Service {
             AbsMean[j] = absoluteMean/16.f;
         }
         Log.i(TAG, Arrays.toString(AbsMean));
+    }
+
+    public long FileSize(String fileName) {
+        File file = new File(fileName);
+        long filesize = file.length();
+        return filesize / 1024;
     }
 }

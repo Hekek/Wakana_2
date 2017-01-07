@@ -287,7 +287,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     public void databasetoString(){
         //PRINT DATABASE
         HashMap<String,String> samples = database.getAllSamples();

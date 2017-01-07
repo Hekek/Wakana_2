@@ -18,7 +18,7 @@ import java.io.OutputStreamWriter;
 public class TremorElaborator implements Runnable {
     final String TAG = "TREMOR-ELABORATOR";
     private String myName;
-    public final int[] RANGE = new int[] { 40, 80, 120, 180, 301 };
+    public final int[] RANGE = new int[] { 40, 80, 120, 180, 300 };
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     private final int CHUNK_SIZE = 4096;
     private static final int FUZ_FACTOR = 2;
@@ -43,14 +43,12 @@ public class TremorElaborator implements Runnable {
     public void run(){
         database = new DatabaseHelper(mContext);
         elaborate();
-        System.out.println(myName + ")Finished");
+        //System.out.println(myName + ")Finished");
     }
     public void elaborate(){
 
         final int totalSize = Audio.length;
-        Log.i(TAG,"Total Size Of data: "+totalSize);
         int amountPossible = totalSize/CHUNK_SIZE;
-        Log.i(TAG,"Amount of CHUNKS: "+amountPossible);
         //When turning into frequency domain we'll need complex numbers:
         Complex[][] results = new Complex[amountPossible][];
 
@@ -67,7 +65,7 @@ public class TremorElaborator implements Runnable {
         highscores = new double[results.length][5];
         points = new long[results.length][5];
         for (int t = 0 ; t < results.length ; t++){
-            for (int freq = 30; freq < 300-1; freq++) {
+            for (int freq = 30; freq < 300; freq++) {
                 //Get the magnitude:
                 double mag = Math.log(results[t][freq].abs() + 1);
 
@@ -81,18 +79,20 @@ public class TremorElaborator implements Runnable {
                 }
             }
             long h = hash(points[t][0], points[t][1], points[t][2], points[t][3]);
-            //Hashes.add(h);
             String hash = ""+h;
             if (database.hashExist(hash))
             {
-                System.out.println("NOTIFY:"+database.getLabel(hash));
-                Intent intent=new Intent(mContext,Notifications.class);
+                String label = database.getLabel(hash);
+                System.out.println("NOTIFY:"+label);
+                Intent intent=new Intent(mContext,Notifications.class).putExtra("LABEL",label);
                 mContext.startService(intent);
+                mContext.stopService(intent);
             }
             HASHES += ""+h+"\n";
+            database.close();
         }
         try {
-            File myFile = new File(Environment.getExternalStorageDirectory().getPath(),"HASHES.txt");
+            File myFile = new File(Environment.getExternalStorageDirectory().getPath()+"/Yuri","HASHES.txt");
             FileOutputStream fOut = new FileOutputStream(myFile,true);
             OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
             myOutWriter.append(HASHES);
@@ -101,8 +101,8 @@ public class TremorElaborator implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //Log.d(TAG, HASHES);
     }
+
     // find out in which range is frequency
     public int getIndex(int freq) {
         int i = 0;

@@ -7,22 +7,13 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.mosta.wakana.Shazam">
+    tools:context="com.example.mosta.wakana.ManageSound">
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start"
-        android:id="@+id/btnStart"
+        android:text="DELETE"
+        android:id="@+id/btn_delete"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="123dp" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="STOP"
-        android:id="@+id/btnStop"
-        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 </RelativeLayout>
