@@ -28,10 +28,6 @@ import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int PICK_CONTACT_REQUEST = 1;
-    public static String EXTRA_DEVICE_ADDRESS;
-    public static String BLUETOOTH_DEVICE_MAC = null;
-
     private DatabaseHelper database;
 
     private ProgressBar mybar;
@@ -61,34 +57,6 @@ public class MainActivity extends AppCompatActivity {
         loadBell();
 
         shapee = (View) findViewById(R.id.myRectangleView);
-
-
-        //Enable Wakana to start service
-        Switch senseSwitch = (Switch) findViewById(R.id.senseSwitch);
-        senseSwitch.setChecked(false);
-        senseSwitch.setVisibility(View.INVISIBLE);
-        senseSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-
-                if (isChecked) {
-                    toast("Sense ON");
-                    if (BLUETOOTH_DEVICE_MAC == null) {
-                        toast("No Bluetooth Device Selected!");
-                    } else {
-                        startCore();
-                        toast("Sense ON");
-                    }
-
-                } else {
-                    toast("Sense OFF");
-                    stopCore();
-                }
-
-            }
-        });
 
         //Tremor Switch
         Switch tremorSwitch = (Switch) findViewById(R.id.tremorSwitch);
@@ -173,15 +141,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //START BACKGROUND SERVICE
-    public void startCore(){
-        startService(new Intent(this, CoreService.class).putExtra(EXTRA_DEVICE_ADDRESS, BLUETOOTH_DEVICE_MAC));
-    }
-    //STOP BACKGROUND SERVICE
-    public void stopCore(){
-        stopService(new Intent(this, CoreService.class));
-    }
 
+    //Tremor is most important part of the app , it take care of capturing all microphone data
     public void startTremor(){
         startService(new Intent(this, TremorService.class));
     }
@@ -209,15 +170,6 @@ public class MainActivity extends AppCompatActivity {
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
 
-        }
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1) {
-            if(resultCode == RESULT_OK){
-                BLUETOOTH_DEVICE_MAC = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-            }
         }
     }
 

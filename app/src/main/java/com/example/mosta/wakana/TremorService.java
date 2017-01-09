@@ -71,7 +71,6 @@ public class TremorService extends Service {
                         if (count > 0) {
                             out.write(buffer, 0, count);
                         }
-                        //System.out.println(FileSize(Environment.getExternalStorageDirectory().getPath()+"HASHES.txt"));
                         //If Size of the Buffer is more than 176kb
                         if(out.size() > 22000)//176000)
                         {
@@ -113,64 +112,6 @@ public class TremorService extends Service {
         return null;
     }
 
-    public void elaborate(){
-        Log.i(TAG,"ANALYZE");
-        byte audio[] = out.toByteArray();
-        final int totalSize = audio.length;
-        Log.i(TAG,"Total Size Of data: "+totalSize);
-        int amountPossible = totalSize/CHUNK_SIZE;
-        Log.i(TAG,"Amount of CHUNKS: "+amountPossible);
-        //When turning into frequency domain we'll need complex numbers:
-        Complex[][] results = new Complex[amountPossible][];
-
-        //For all the chunks:
-        for(int times = 0;times < amountPossible; times++) {
-            Complex[] complex = new Complex[CHUNK_SIZE];
-            for(int i = 0;i < CHUNK_SIZE;i++) {
-                //Put the time domain data into a complex number with imaginary part as 0:
-                complex[i] = new Complex(audio[(times*CHUNK_SIZE)+i], 0);
-            }
-            //Perform FFT analysis on the chunk:
-            results[times] = FFT.fft(complex);
-        }
-
-        highscores = new double[results.length][5];
-        for(int i = 0;i < results.length;i++)
-        {
-            for(int j = 0;j < 5;j++)
-            {
-                highscores[i][j] = 0;
-            }
-        }
-        points = new long[results.length][5];
-        for(int i = 0;i < results.length;i++)
-        {
-            for(int j = 0;j < 5;j++)
-            {
-                points[i][j] = 0;
-            }
-        }
-        for (int t = 0 ; t < results.length ; t++){
-            for (int freq = 30; freq < 300-1; freq++) {
-                //Get the magnitude:
-                double mag = Math.log(results[t][freq].abs() + 1);
-
-                //Find out which range we are in:
-                int index = getIndex(freq);
-
-                //Save the highest magnitude and corresponding frequency:
-                if (mag > highscores[t][index]) {
-                    highscores[t][index] = mag;
-                    points[t][index] = freq;
-                }
-            }
-            Log.i(TAG,points[t][0]+"-"+points[t][1]+"-"+points[t][2]+"-"+points[t][3]+"-"+points[t][4]);
-            long h = hash(points[t][0], points[t][1], points[t][2], points[t][3]);
-
-        }
-
-    }
-
     // find out in which range is frequency
     public int getIndex(int freq) {
         int i = 0;
@@ -185,67 +126,6 @@ public class TremorService extends Service {
                 + (p1 - (p1 % FUZ_FACTOR));
     }
 
-    public void computeFFT(){
-        Log.i(TAG,"COMPUTE");
-        //Conversion from short to double
-        double[] micBufferData = new double[bufferSize];//size may need to change
-        final int bytesPerSample = 2; // As it is 16bit PCM
-        final double amplification = 100.0; // choose a number as you like
-        for (int index = 0, floatIndex = 0; index < bufferSize - bytesPerSample + 1; index += bytesPerSample, floatIndex++) {
-            double sample = 0;
-            for (int b = 0; b < bytesPerSample; b++) {
-                int v = buffer[index + b];
-                if (b < bytesPerSample - 1 || bytesPerSample == 1) {
-                    v &= 0xFF;
-                }
-                sample += v << (b * 8);
-            }
-            double sample32 = amplification * (sample / 32768.0);
-            micBufferData[floatIndex] = sample32;
-        }
-
-        //Create Complex array for use in FFT
-        Complex[] fftTempArray = new Complex[bufferSize];
-        for (int i=0; i<bufferSize; i++)
-        {
-            fftTempArray[i] = new Complex(micBufferData[i], 0);
-        }
-
-        //Obtain array of FFT data
-        final Complex[] fftArray = FFT.fft(fftTempArray);
-        final Complex[] fftInverse = FFT.ifft(fftTempArray);
-
-        //Create an array of magnitude of fftArray
-        double[] magnitude = new double[fftArray.length];
-        for (int i=0; i<fftArray.length; i++){
-            magnitude[i]= fftArray[i].abs();
-        }
-
-        Log.i(TAG,"fftArray is "+ fftArray[500] +" and fftTempArray is "+fftTempArray[500] + " and fftInverse is "+fftInverse[500]+" and audioData is "+buffer[500]+ " and magnitude is "+ magnitude[1] + ", "+magnitude[500]+", "+magnitude[1000]+" You rock dude!");
-        /*for(int i = 2; i < samples; i++){
-            Log.i(TAG," " + magnitude[i] + " Hz");
-        }*/
-    }
-
-    private void generateData(byte[] fft){
-        Float mean = 0.0f;
-        Float absoluteMean = 0.0f;
-        Float [] Mean = new Float[8];
-        Float [] AbsMean = new Float[8];
-        String var = Arrays.toString(fft);
-        String[] vars = var.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(" ","").split(",");
-        for (int j = 0 ; j < GFreq ; j++){
-            mean = 0.0f;
-            absoluteMean = 0.0f;
-            for (int i = 0 ; i < GFreqSize ; i++){
-                mean += Integer.parseInt(vars[i+j]);
-                absoluteMean += Math.abs(Integer.parseInt(vars[i+j]));
-            }
-            Mean[j] = mean/16.f;
-            AbsMean[j] = absoluteMean/16.f;
-        }
-        Log.i(TAG, Arrays.toString(AbsMean));
-    }
 
     public long FileSize(String fileName) {
         File file = new File(fileName);

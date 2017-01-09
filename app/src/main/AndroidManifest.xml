@@ -27,7 +27,6 @@
         <activity android:name=".AddSoundActivity" />
         <activity android:name=".ManageSounds" />
 
-        <service android:name=".CoreService" />
         <service android:name=".TremorService" />
         <service
             android:name=".Notifications"
