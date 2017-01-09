@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "CORE";
 
-    private boolean Tremor=false;
+    private boolean Tremor = false;
 
     public String lastnotify = null;
 
@@ -57,26 +57,6 @@ public class MainActivity extends AppCompatActivity {
         loadBell();
 
         shapee = (View) findViewById(R.id.myRectangleView);
-
-        //Tremor Switch
-        Switch tremorSwitch = (Switch) findViewById(R.id.tremorSwitch);
-        tremorSwitch.setChecked(false);
-        tremorSwitch.setVisibility(View.INVISIBLE);
-        tremorSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                if (isChecked) {
-                    toast("Tremor ON");
-                    startTremor();
-
-                } else {
-                    toast("Tremor OFF");
-                    stopTremor();
-                }
-            }
-        });
     }
 
     @Override
@@ -113,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop(){
         super.onStop();
-        System.out.println("STOP CLOSED");
+        System.out.println("STOP");
     }
 
     @Override

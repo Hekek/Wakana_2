@@ -9,33 +9,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.mosta.wakana.MainActivity">
 
-    <Switch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sense"
-        android:id="@+id/senseSwitch"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:checked="false"
-        android:layout_margin="5dp" />
-
-    <Switch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tremor"
-        android:id="@+id/tremorSwitch"
-        android:layout_below="@+id/senseSwitch"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:checked="false"
-        android:layout_margin="5dp"
-        android:elegantTextHeight="false" />
-
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="250dp"

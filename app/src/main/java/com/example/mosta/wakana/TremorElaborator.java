@@ -82,6 +82,7 @@ public class TremorElaborator implements Runnable {
             String hash = ""+h;
             if (database.hashExist(hash))
             {
+                //ANOTHER THREAD SHOULD START HERE FOR THE SPECIFIED SOUND - NEED TO BE DONE
                 String label = database.getLabel(hash);
                 System.out.println("NOTIFY:"+label);
                 Intent intent=new Intent(mContext,Notifications.class).putExtra("LABEL",label);
