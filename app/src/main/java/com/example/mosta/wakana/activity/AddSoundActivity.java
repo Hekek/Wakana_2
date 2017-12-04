@@ -1,20 +1,20 @@
-package com.example.mosta.wakana;
+package com.example.mosta.wakana.activity;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.mosta.wakana.helper.DatabaseHelper;
+import com.example.mosta.wakana.R;
+import com.example.mosta.wakana.service.TremorElaborator;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -29,27 +29,43 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class AddSoundActivity extends AppCompatActivity {
+
     private String TAG = "AddSoundActivity";
+
     private Button btn_record;
+
     private Button btn_stoprecord;
+
     private Button btn_save;
+
     private EditText sound_label;
+
     private TextView txtview_log;
+
     private boolean isRecording = false;
+
     private final int bufferSize = 4096;//AudioRecord.getMinBufferSize(44100,AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+
     final AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+
     final byte[] buffer = new byte[bufferSize];
+
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    int contatore = 0 ;
-    private int elements ;
+
+    int contatore = 0;
+
+    private int elements;
+
     private final int MAX_HASHES_PER_SOUND = 9;
+
     ArrayList<String> Hashes = new ArrayList<>();
-    Map<String,Integer> map = new HashMap<>();
+
+    Map<String, Integer> map = new HashMap<>();
+
     ExecutorService executor = Executors.newFixedThreadPool(2);
 
     private String sound_name;
@@ -73,26 +89,24 @@ public class AddSoundActivity extends AppCompatActivity {
         btn_record.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isRecording)
-                {
+                if (!isRecording) {
                     isRecording = true;
                     deleteOldHashes();
                     recorder.startRecording();
-                    new Thread(new Runnable(){
+                    new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            try{
+                            try {
                                 while (isRecording) {
                                     int count = recorder.read(buffer, 0, bufferSize);
                                     if (count > 0) {
                                         out.write(buffer, 0, count);
                                     }
                                     //If Size of the Buffer is more than 176kb
-                                    if(out.size() > 176000)
-                                    {
-                                        contatore ++ ;
+                                    if (out.size() > 176000) {
+                                        contatore++;
                                         byte audio[] = out.toByteArray();
-                                        Runnable taskOne = new TremorElaborator("TASK"+contatore,audio,getBaseContext());
+                                        Runnable taskOne = new TremorElaborator("TASK" + contatore, audio, getBaseContext());
                                         executor.execute(taskOne);
                                         //elaborate();
                                         out.reset();
@@ -102,7 +116,7 @@ public class AddSoundActivity extends AppCompatActivity {
                                 }
 
                                 out.close();
-                            }catch (IOException e) {
+                            } catch (IOException e) {
                                 System.err.println("I/O problems: " + e);
                                 System.exit(-1);
                             }
@@ -116,8 +130,7 @@ public class AddSoundActivity extends AppCompatActivity {
         btn_stoprecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isRecording)
-                {
+                if (isRecording) {
                     //Stop recording
                     isRecording = false;
                     recorder.stop();
@@ -125,7 +138,7 @@ public class AddSoundActivity extends AppCompatActivity {
                     executor.shutdown();
 
                     //Get data from file and add them to a list
-                    String root = Environment.getExternalStorageDirectory().getPath()+"/Yuri";
+                    String root = Environment.getExternalStorageDirectory().getPath() + "/Yuri";
                     File file = new File(root, "HASHES.txt");
                     try {
                         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -153,8 +166,7 @@ public class AddSoundActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 sound_name = sound_label.getText().toString();
-                if (!isRecording && sound_name != "" && !database.soundExist(sound_name))
-                {
+                if (!isRecording && sound_name != "" && !database.soundExist(sound_name)) {
                     //SORT MAP
                     Set<Map.Entry<String, Integer>> set = map.entrySet();
                     List<Map.Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(set);
@@ -165,25 +177,20 @@ public class AddSoundActivity extends AppCompatActivity {
                     });
 
                     //GET TOP 10 POINTS AND ADD THEM TO DATABASE
-                    elements = 0 ;
+                    elements = 0;
                     for (Map.Entry<String, Integer> entry : list) {
                         txtview_log.append(entry.getKey() + " ==== " + entry.getValue() + "\n");
-                        if (entry.getKey().length() > 3)
-                        {
-                            database.createSample(entry.getKey(),sound_name);
+                        if (entry.getKey().length() > 3) {
+                            database.createSample(entry.getKey(), sound_name);
                             elements++;
                         }
                         if (elements > MAX_HASHES_PER_SOUND)
                             break;
                     }
                     toast("ADDED SOUND TO DB");
-                }
-                else if (database.soundExist(sound_name))
-                {
+                } else if (database.soundExist(sound_name)) {
                     toast("ERROR: Change sound name");
-                }
-                else if (sound_name == "")
-                {
+                } else if (sound_name == "") {
                     toast("ERROR: Add sound label ");
                 }
                 databasetoString();
@@ -192,33 +199,31 @@ public class AddSoundActivity extends AppCompatActivity {
         });
 
     }
-    private void deleteOldHashes(){
-        try
-        {
+
+    private void deleteOldHashes() {
+        try {
             String root = Environment.getExternalStorageDirectory().getPath();
-            File file = new File(root,"HASHES.txt");
-            if(file.exists())
+            File file = new File(root, "HASHES.txt");
+            if (file.exists())
                 file.delete();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void toast(String text){
+    public void toast(String text) {
         Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
     }
 
-    public void databasetoString(){
+    public void databasetoString() {
         //PRINT DATABASE
-        HashMap<String,String> samples = database.getAllSamples();
+        HashMap<String, String> samples = database.getAllSamples();
         System.out.println("Size: " + samples.size());
         Iterator<String> iterator = samples.keySet().iterator();
 
         while (iterator.hasNext()) {
             String key = iterator.next();
-
             String value = samples.get(key).toString();
-
             System.out.println(key + " " + value);
         }
     }

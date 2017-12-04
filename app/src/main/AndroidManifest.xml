@@ -17,23 +17,23 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
-        <activity android:name=".MainActivity">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddSoundActivity" />
-        <activity android:name=".ManageSounds" />
+        <activity android:name=".activity.AddSoundActivity" />
+        <activity android:name=".activity.ManageSoundsActivity" />
 
-        <service android:name=".TremorService" />
+        <service android:name=".service.TremorService" />
         <service
-            android:name=".Notifications"
+            android:name=".service.NotificationService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".ManageSound"></activity>
+        <activity android:name=".activity.ManageSoundDetailActivity"></activity>
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package com.example.mosta.wakana;
+package com.example.mosta.wakana.service;
 
 import android.app.Service;
 import android.content.Intent;
@@ -10,36 +10,47 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 
 /**
  * Created by mosta on 10/05/16.
  */
 public class TremorService extends Service {
+
     public String TAG = "TREMOR SERVICE";
+
     private static int GFreqSize = 448;
+
     private static int GFreq = 8;
-    boolean isRecording = true;
-    public final int[] RANGE = new int[] { 40, 80, 120, 180, 301 };
-    final int bufferSize = 4096;//AudioRecord.getMinBufferSize(44100,AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
-    final AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
-    final byte[] buffer = new byte[bufferSize];
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+    private boolean isRecording = true;
+
+    public final int[] RANGE = new int[]{40, 80, 120, 180, 301};
+
+    private final int bufferSize = 4096;//AudioRecord.getMinBufferSize(44100,AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+
+    private final AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+
+    private final byte[] buffer = new byte[bufferSize];
+
+    private ByteArrayOutputStream out = new ByteArrayOutputStream();
+
     private static int CHUNK_SIZE = 4096;
+
     private static final int FUZ_FACTOR = 2;
-    double highscores[][];
-    long points[][];
-    int contatore = 0 ;
+
+    private double highscores[][];
+
+    private long points[][];
+
+    private int contatore = 0;
 
     //TEST
-    ExecutorService executor = Executors.newFixedThreadPool(2);
+    private ExecutorService executor = Executors.newFixedThreadPool(2);
 
     @Override
     public void onCreate() {
@@ -48,36 +59,35 @@ public class TremorService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG,"Tremor Started");
-        Log.i(TAG,"BUFF:"+bufferSize);
+        Log.i(TAG, "Tremor Started");
+        Log.i(TAG, "BUFF:" + bufferSize);
         //DELETE OLD SAVED HASHES
-        try
-        {
-            String root = Environment.getExternalStorageDirectory().getPath()+"/Yuri";
-            File file = new File(root,"HASHES.txt");
-            if(file.exists())
+        try {
+            String root = Environment.getExternalStorageDirectory().getPath() + "/Yuri";
+            File file = new File(root, "HASHES.txt");
+            if (file.exists())
                 file.delete();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         recorder.startRecording();
 
-        new Thread(new Runnable(){
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                try{
+                try {
                     while (isRecording) {
                         int count = recorder.read(buffer, 0, bufferSize);
                         if (count > 0) {
                             out.write(buffer, 0, count);
                         }
                         //If Size of the Buffer is more than 176kb
-                        if(out.size() > 22000)//176000)
+                        if (out.size() > 22000)//176000)
                         {
-                            contatore ++ ;
+                            contatore++;
                             byte audio[] = out.toByteArray();
-                            Log.i(TAG,"Analyze("+contatore+")");
-                            Runnable taskOne = new TremorElaborator("TASK"+contatore,audio,getBaseContext());
+                            Log.i(TAG, "Analyze(" + contatore + ")");
+                            Runnable taskOne = new TremorElaborator("TASK" + contatore, audio, getBaseContext());
                             executor.execute(taskOne);
                             //elaborate();
                             out.reset();
@@ -87,14 +97,14 @@ public class TremorService extends Service {
                     }
 
                     out.close();
-                }catch (IOException e) {
+                } catch (IOException e) {
                     System.err.println("I/O problems: " + e);
                     System.exit(-1);
                 }
             }
 
         }).start();
-        return super.onStartCommand(intent , flags , startId);
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
@@ -125,7 +135,6 @@ public class TremorService extends Service {
                 * 100000 + (p2 - (p2 % FUZ_FACTOR)) * 100
                 + (p1 - (p1 % FUZ_FACTOR));
     }
-
 
     public long FileSize(String fileName) {
         File file = new File(fileName);

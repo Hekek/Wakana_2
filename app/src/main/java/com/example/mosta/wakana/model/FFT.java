@@ -1,4 +1,4 @@
-package com.example.mosta.wakana;
+package com.example.mosta.wakana.model;
 
 /**
  * Created by mosta on 12/05/16.

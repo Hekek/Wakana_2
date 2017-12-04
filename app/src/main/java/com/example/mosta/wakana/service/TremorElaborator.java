@@ -1,11 +1,12 @@
-package com.example.mosta.wakana;
-
-
+package com.example.mosta.wakana.service;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
-import android.util.Log;
+
+import com.example.mosta.wakana.model.Complex;
+import com.example.mosta.wakana.helper.DatabaseHelper;
+import com.example.mosta.wakana.model.FFT;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -16,55 +17,64 @@ import java.io.OutputStreamWriter;
  * Created by mosta on 15/05/16.
  */
 public class TremorElaborator implements Runnable {
+
     final String TAG = "TREMOR-ELABORATOR";
+
     private String myName;
-    public final int[] RANGE = new int[] { 40, 80, 120, 180, 300 };
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+    private final int[] RANGE = new int[]{40, 80, 120, 180, 300};
+
+    private ByteArrayOutputStream out = new ByteArrayOutputStream();
+
     private final int CHUNK_SIZE = 4096;
+
     private static final int FUZ_FACTOR = 2;
-    double highscores[][];
-    long points[][];
-    public byte Audio[];
-    public String HASHES ="";
+
+    private double highscores[][];
+
+    private long points[][];
+
+    private byte Audio[];
+
+    private String HASHES = "";
+
     private DatabaseHelper database;
-    public Context mContext;
 
+    private Context mContext;
 
-
-
-    TremorElaborator(String name , byte[] audio , Context context){
+    public TremorElaborator(String name, byte[] audio, Context context) {
         this.myName = name;
         this.Audio = audio;
         mContext = context;
-
     }
 
     @Override
-    public void run(){
+    public void run() {
         database = new DatabaseHelper(mContext);
         elaborate();
         //System.out.println(myName + ")Finished");
     }
-    public void elaborate(){
+
+    public void elaborate() {
 
         final int totalSize = Audio.length;
-        int amountPossible = totalSize/CHUNK_SIZE;
+        int amountPossible = totalSize / CHUNK_SIZE;
         //When turning into frequency domain we'll need complex numbers:
         Complex[][] results = new Complex[amountPossible][];
 
         //For all the chunks:
-        for(int times = 0;times < amountPossible; times++) {
+        for (int times = 0; times < amountPossible; times++) {
             Complex[] complex = new Complex[CHUNK_SIZE];
-            for(int i = 0;i < CHUNK_SIZE;i++) {
+            for (int i = 0; i < CHUNK_SIZE; i++) {
                 //Put the time domain data into a complex number with imaginary part as 0:
-                complex[i] = new Complex(Audio[(times*CHUNK_SIZE)+i], 0);
+                complex[i] = new Complex(Audio[(times * CHUNK_SIZE) + i], 0);
             }
             //Perform FFT analysis on the chunk:
             results[times] = FFT.fft(complex);
         }
         highscores = new double[results.length][5];
         points = new long[results.length][5];
-        for (int t = 0 ; t < results.length ; t++){
+        for (int t = 0; t < results.length; t++) {
             for (int freq = 30; freq < 300; freq++) {
                 //Get the magnitude:
                 double mag = Math.log(results[t][freq].abs() + 1);
@@ -79,22 +89,21 @@ public class TremorElaborator implements Runnable {
                 }
             }
             long h = hash(points[t][0], points[t][1], points[t][2], points[t][3]);
-            String hash = ""+h;
-            if (database.hashExist(hash))
-            {
+            String hash = "" + h;
+            if (database.hashExist(hash)) {
                 //ANOTHER THREAD SHOULD START HERE FOR THE SPECIFIED SOUND - NEED TO BE DONE
                 String label = database.getLabel(hash);
-                System.out.println("NOTIFY:"+label);
-                Intent intent=new Intent(mContext,Notifications.class).putExtra("LABEL",label);
+                System.out.println("NOTIFY:" + label);
+                Intent intent = new Intent(mContext, NotificationService.class).putExtra("LABEL", label);
                 mContext.startService(intent);
                 mContext.stopService(intent);
             }
-            HASHES += ""+h+"\n";
+            HASHES += "" + h + "\n";
             database.close();
         }
         try {
-            File myFile = new File(Environment.getExternalStorageDirectory().getPath()+"/Yuri","HASHES.txt");
-            FileOutputStream fOut = new FileOutputStream(myFile,true);
+            File myFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Yuri", "HASHES.txt");
+            FileOutputStream fOut = new FileOutputStream(myFile, true);
             OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
             myOutWriter.append(HASHES);
             myOutWriter.close();

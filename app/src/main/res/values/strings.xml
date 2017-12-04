@@ -5,4 +5,6 @@
     <string name="Sounds">Sounds</string>
     <string name="tremor">Tremor</string>
     <string name="sense">Sense</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
 </resources>
