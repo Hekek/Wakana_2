@@ -1,5 +1,6 @@
 package com.example.mosta.wakana.activity;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -7,9 +8,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -35,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String AMBULANCE = "Ambulance";
 
     public static final String BELL = "Bell";
+
+    private static final int MY_PERMISSIONS_REQUEST_READ_STORAGE = 1 ;
 
     private DatabaseHelper database;
 
@@ -93,13 +99,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Permissions
+        permissions();
+
         database = new DatabaseHelper(getBaseContext());
         createYuriDirectory();
 
         //LOAD DEFAULT SOUND
+
         loadAmbulance();
         loadBell();
-
     }
 
     @Override
@@ -271,6 +280,41 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void permissions(){
+        System.out.println("Requesting Permissions");
+        //Control if we have the permission to Record Audio
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.RECORD_AUDIO)) {
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.RECORD_AUDIO},
+                        1);
+            }
+        }
+
+        //Control if we have the permission to Record Audio
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        1);
+            }
         }
     }
 }
